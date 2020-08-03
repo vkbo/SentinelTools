@@ -22,9 +22,10 @@
  along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
+import os
 import logging
 
-__package__    = "SentinelTools"
+__package__    = "sentinel"
 __author__     = "Veronica Berglyd Olsen"
 __copyright__  = "Copyright 2020, Veronica Berglyd Olsen and MET Norway"
 __license__    = "GPLv3"
@@ -35,6 +36,7 @@ __credits__    = [
     "Veronica Berglyd Olsen",
 ]
 
+from .config import Config
 
 # Initiating logging
 strLevel = os.environ.get("SENTINEL_LOGLEVEL", "INFO")
