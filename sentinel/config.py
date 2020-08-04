@@ -32,9 +32,11 @@ logger = logging.getLogger(__name__)
 
 class Config():
 
-    def __init__(self):
+    def __init__(self, lookFolder=None):
 
         self._packRoot = None
+        self._lookFolder = lookFolder
+        self._confPath = None
 
         # Config Settings
         self.apiUser = ""
@@ -69,19 +71,26 @@ class Config():
         rootDir = path.abspath(path.join(self._packRoot, path.pardir))
         logger.debug("Package root directory is: %s" % rootDir)
 
-        userConf = path.join(rootDir, "config.json")
+        if self._lookFolder is None:
+            userConf = path.join(rootDir, "config.json")
+        else:
+            userConf = path.join(self._lookFolder, "config.json")
+
         if path.isfile(userConf):
             logger.debug("Loading file: %s" % userConf)
             jsonData = {}
             try:
                 with open(userConf, mode="r") as inFile:
                     jsonData = json.loads(inFile.read())
+
                 if "apiUsername" in jsonData:
                     self.apiUser = jsonData["apiUsername"]
                 if "apiPassword" in jsonData:
                     self.apiPass = jsonData["apiPassword"]
                 if "apiURL" in jsonData:
                     self.apiURL = jsonData["apiURL"]
+
+                self._confPath = userConf
 
             except Exception as e:
                 logger.error("Failed to parse config JSON data.")
