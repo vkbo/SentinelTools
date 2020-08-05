@@ -37,10 +37,10 @@ __credits__    = [
 ]
 
 from .config import Config
-from .apiwrapper import SentinelAPI
+from .autoapi import AutoAPI
 
 __all__ = [
-    "Config", "SentinelAPI"
+    "Config", "AutoAPI"
 ]
 
 # Initiating logging

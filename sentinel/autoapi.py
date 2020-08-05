@@ -3,7 +3,7 @@
 
  Sentinel Tools - API Class
 ============================
- Wrapper class for the Sentinel (Copernicus) API
+ Simple wrapper class for the Sentinel API that takes a Config object.
 
  This file is a part of Sentinel Tools
 
@@ -24,33 +24,36 @@
 
 import logging
 
+from sentinelsat import SentinelAPI
+
 from .config import Config
 
 logger = logging.getLogger(__name__)
 
-class SentinelAPI():
+class AutoAPI():
 
-    def __init__(self, username="", password="", url=""):
+    def __init__(self, config):
 
         self._apiUser = ""
         self._apiPass = ""
-        self._apiURL  = ""
+        self._apiURL  = "https://scihub.copernicus.eu/dhus"
+        self._theAPI  = None
 
-        self.apiUser = username
-        self.apiPass = password
-        self.apiURL  = url
-
-        return
-
-    @classmethod
-    def fromConfig(cls, config):
-        """Instansiate from a sentinel.Config object.
-        """
         if isinstance(config, Config):
-            return cls(config.apiUser, config.apiPass, config.apiURL)
+            self.apiUser = config.apiUser
+            self.apiPass = config.apiPass
+            self.apiURL  = config.apiURL
         else:
             raise ValueError("Property 'config' is not an instance of sentinel.Config")
-        return cls()
+
+        try:
+            self._theAPI = SentinelAPI(self._apiUser, self._apiPass, api_url=self._apiURL)
+        except Exception as e:
+            logger.error("Could not set up Sentinel API")
+            logger.error(str(e))
+            return
+
+        return
 
     ##
     #  Properties
@@ -77,7 +80,7 @@ class SentinelAPI():
         if isinstance(username, str):
             self._apiUser = username
         else:
-            raise ValueError("Property 'username' must be a string")
+            raise ValueError("Attribute 'username' must be a string")
         return
 
     @apiPass.setter
@@ -85,7 +88,7 @@ class SentinelAPI():
         if isinstance(password, str):
             self._apiPass = password
         else:
-            raise ValueError("Property 'password' must be a string")
+            raise ValueError("Attribute 'password' must be a string")
         return
 
     @apiURL.setter
@@ -93,7 +96,19 @@ class SentinelAPI():
         if isinstance(url, str):
             self._apiURL = url
         else:
-            raise ValueError("Property 'url' must be a string")
+            raise ValueError("Attribute 'url' must be a string")
         return
 
-# END Class SentinelAPI
+    ##
+    #  Getters
+    ##
+
+    def getAPI(self):
+        """Returns the API object.
+        """
+        if self._theAPI is None or not isinstance(self._theAPI, SentinelAPI):
+            raise ConnectionError("Not connected to the API")
+
+        return self._theAPI
+
+# END Class AutoAPI
