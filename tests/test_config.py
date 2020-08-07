@@ -2,6 +2,8 @@
 
 import pytest
 
+from sentinelsat import SentinelAPI
+
 from sentinel import Config, AutoAPI
 
 def testConfigInit(stInput):
@@ -14,7 +16,7 @@ def testConfigInit(stInput):
 def testAutoAPI(stInput):
     sConf = Config(lookFolder=stInput)
     sAPI = AutoAPI(sConf)
-
+    assert isinstance(sAPI.getAPI(), SentinelAPI)
     with pytest.raises(ValueError):
         sAPI.apiUser = 1
     with pytest.raises(ValueError):

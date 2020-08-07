@@ -36,11 +36,17 @@ __credits__    = [
     "Veronica Berglyd Olsen",
 ]
 
-from .config import Config
+
 from .autoapi import AutoAPI
+from .config import Config
+from .constants import SQuery
+from .querybuilder import QueryBuilder, FilterS1
 
 __all__ = [
-    "Config", "AutoAPI"
+    "AutoAPI",
+    "Config",
+    "SQuery",
+    "QueryBuilder", "FilterS1",
 ]
 
 # Initiating logging
