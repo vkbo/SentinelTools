@@ -39,14 +39,12 @@ __credits__    = [
 
 from .autoapi import AutoAPI
 from .config import Config
-from .constants import SQuery
-from .querybuilder import QueryBuilder, FilterS1
+from .sentinelone import SentinelOne
 
 __all__ = [
     "AutoAPI",
     "Config",
-    "SQuery",
-    "QueryBuilder", "FilterS1",
+    "SentinelOne",
 ]
 
 # Initiating logging

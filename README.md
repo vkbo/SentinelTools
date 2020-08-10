@@ -1,6 +1,7 @@
 # SentinelTools
 
-A simple toolbox for extracting certain datasets from ESA sentinel satellites.
+Tools for extracting data from the [ESA Sentinel](https://www.copernicus.eu/en) satellites.
+The tools are specifically for the [Machine Ocean](https://machineocean.met.no/) project at [MET Norway](https://met.no).
 
 ## Dependencies
 
