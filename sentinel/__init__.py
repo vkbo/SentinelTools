@@ -25,6 +25,10 @@
 import os
 import logging
 
+from .autoapi import AutoAPI
+from .config import Config
+from .sentinelone import SentinelOne
+
 __package__    = "sentinel"
 __author__     = "Veronica Berglyd Olsen"
 __copyright__  = "Copyright 2020, MET Norway (Machine Ocean Project)"
@@ -35,11 +39,6 @@ __url__        = "https://github.com/vkbo/SentinelTools"
 __credits__    = [
     "Veronica Berglyd Olsen",
 ]
-
-
-from .autoapi import AutoAPI
-from .config import Config
-from .sentinelone import SentinelOne
 
 __all__ = [
     "AutoAPI",

@@ -60,6 +60,15 @@ class Config():
             apiURL  = self.apiURL,
         )
 
+    def printInfo(self, showPw=False):
+        """Print the settings to the logger.
+        """
+        apiPass = self.apiPass if showPw else "*"*len(self.apiPass)
+        logger.info("API Username: %s" % self.apiUser)
+        logger.info("API Password: %s" % apiPass)
+        logger.info("API URL:      %s" % self.apiURL)
+        return
+
     ##
     #  Internal Functions
     ##
@@ -83,12 +92,9 @@ class Config():
                 with open(userConf, mode="r") as inFile:
                     jsonData = json.loads(inFile.read())
 
-                if "apiUsername" in jsonData:
-                    self.apiUser = jsonData["apiUsername"]
-                if "apiPassword" in jsonData:
-                    self.apiPass = jsonData["apiPassword"]
-                if "apiURL" in jsonData:
-                    self.apiURL = jsonData["apiURL"]
+                self.apiUser = jsonData.get("apiUsername", "")
+                self.apiPass = jsonData.get("apiPassword", "")
+                self.apiURL  = jsonData.get("apiURL", "")
 
                 self._confPath = userConf
 
@@ -98,7 +104,7 @@ class Config():
                 return False
 
         else:
-            logger.debug("No file: %s" % confFile)
+            logger.debug("No file: %s" % userConf)
 
         return
 

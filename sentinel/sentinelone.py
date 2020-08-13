@@ -24,10 +24,6 @@
 
 import logging
 
-from sentinelsat import SentinelAPI
-
-from .config import Config
-from .autoapi import AutoAPI
 from .sentinel import Sentinel
 
 logger = logging.getLogger(__name__)
