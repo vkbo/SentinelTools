@@ -36,7 +36,7 @@ class AutoAPI():
 
         self._apiUser = ""
         self._apiPass = ""
-        self._apiURL  = "https://scihub.copernicus.eu/dhus"
+        self._apiURL  = "https://scihub.copernicus.eu"
         self._theAPI  = None
 
         if isinstance(config, Config):

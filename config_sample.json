@@ -1,5 +1,11 @@
 {
-    "apiUsername": "",
-    "apiPassword": "",
-    "apiURL": "https://scihub.copernicus.eu/apihub/"
+    "default" : "copernicus",
+    "apis": [
+        {
+            "apiName" : "copernicus",
+            "apiUsername": "",
+            "apiPassword": "",
+            "apiURL": "https://scihub.copernicus.eu/apihub"
+        }
+    ]
 }

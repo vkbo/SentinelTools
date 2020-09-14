@@ -32,18 +32,19 @@ logger = logging.getLogger(__name__)
 
 class Config():
 
-    def __init__(self, lookFolder=None):
+    def __init__(self, apiName=None, lookFolder=None):
 
         self._packRoot = None
         self._lookFolder = lookFolder
         self._confPath = None
 
         # Config Settings
+        self.apiName = ""
         self.apiUser = ""
         self.apiPass = ""
         self.apiURL  = ""
 
-        self._loadConfig()
+        self.loadConfig(apiName=apiName)
 
         return
 
@@ -51,10 +52,12 @@ class Config():
         """Return a string of the content of the class.
         """
         return (
+            "API Name:     {apiName:s}\n"
             "API Username: {apiUser:s}\n"
             "API Password: {apiPass:s}\n"
             "API URL:      {apiURL:s}\n"
         ).format(
+            apiName = self.apiName,
             apiUser = self.apiUser,
             apiPass = "*"*len(self.apiPass),
             apiURL  = self.apiURL,
@@ -64,16 +67,13 @@ class Config():
         """Print the settings to the logger.
         """
         apiPass = self.apiPass if showPw else "*"*len(self.apiPass)
+        logger.info("API Name:     %s" % self.apiName)
         logger.info("API Username: %s" % self.apiUser)
         logger.info("API Password: %s" % apiPass)
         logger.info("API URL:      %s" % self.apiURL)
         return
 
-    ##
-    #  Internal Functions
-    ##
-
-    def _loadConfig(self):
+    def loadConfig(self, apiName=None):
         """Load the config files, if they exist, and extract the data.
         """
         self._packRoot = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
@@ -92,9 +92,28 @@ class Config():
                 with open(userConf, mode="r") as inFile:
                     jsonData = json.loads(inFile.read())
 
-                self.apiUser = jsonData.get("apiUsername", "")
-                self.apiPass = jsonData.get("apiPassword", "")
-                self.apiURL  = jsonData.get("apiURL", "")
+                if apiName is None:
+                    apiName = jsonData.get("default", None)
+
+                apiList = jsonData.get("apis", None)
+                if apiList is None:
+                    logger.error("Could not find any apis in config file")
+                    return False
+
+                if not isinstance(apiList, list):
+                    logger.error("Invalid apis list in config file")
+                    return False
+
+                if len(apiList) == 0:
+                    logger.error("Empty apis list in config file")
+                    return False
+
+                for apiEntry in apiList:
+                    if apiEntry.get("apiName", None) == apiName:
+                        self.apiName = apiEntry.get("apiName", "")
+                        self.apiUser = apiEntry.get("apiUsername", "")
+                        self.apiPass = apiEntry.get("apiPassword", "")
+                        self.apiURL  = apiEntry.get("apiURL", "")
 
                 self._confPath = userConf
 
