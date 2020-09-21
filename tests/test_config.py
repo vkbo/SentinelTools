@@ -11,7 +11,7 @@ def testConfigInit(stInput):
     assert sConf._lookFolder is not None
     assert sConf.apiUser == "user"
     assert sConf.apiPass == "password"
-    assert sConf.apiURL
+    assert sConf.apiURL  == "https://scihub.copernicus.eu/apihub"
 
 def testAutoAPI(stInput):
     sConf = Config(lookFolder=stInput)

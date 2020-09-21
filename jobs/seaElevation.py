@@ -44,7 +44,7 @@ fpQuery = (
 cQuery = SentinelAPI.format_query(
     area = fpMap,
     raw  = fpQuery,
-    date = ("2019-08-01T00:00:00Z", "2019-09-13T23:59:59Z")
+    date = ("2019-09-01T00:00:00Z", "2019-09-19T23:59:59Z")
 )
 # print(cQuery)
 
@@ -52,8 +52,10 @@ nResult = cAPI.count(raw=cQuery)
 logger.info("Query matched %d datasets" % nResult)
 
 qDict = cAPI.query(raw=cQuery)
-for aKey, aDataSet in qDict.items():
-    print(aKey)
-    for dKey, dValue in aDataSet.items():
-        print("%s:" % dKey, dValue)
-    break
+sData.saveQueryResults(qDict)
+sData.flushIndex()
+# for aKey, aDataSet in qDict.items():
+#     print(aKey)
+#     for dKey, dValue in aDataSet.items():
+#         print("%s:" % dKey, dValue)
+#     break

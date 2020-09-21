@@ -1,5 +1,12 @@
 {
-    "apiUsername": "user",
-    "apiPassword": "password",
-    "apiURL": "https://scihub.copernicus.eu/apihub/"
+    "dataPath" : "/home",
+    "default" : "copernicus",
+    "apis": [
+        {
+            "apiName" : "copernicus",
+            "apiUsername": "user",
+            "apiPassword": "password",
+            "apiURL": "https://scihub.copernicus.eu/apihub"
+        }
+    ]
 }
