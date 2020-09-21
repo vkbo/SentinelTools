@@ -39,10 +39,11 @@ class Config():
         self._confPath = None
 
         # Config Settings
-        self.apiName = ""
-        self.apiUser = ""
-        self.apiPass = ""
-        self.apiURL  = ""
+        self.apiName  = ""
+        self.apiUser  = ""
+        self.apiPass  = ""
+        self.apiURL   = ""
+        self.dataPath = ""
 
         self.loadConfig(apiName=apiName)
 
@@ -56,11 +57,13 @@ class Config():
             "API Username: {apiUser:s}\n"
             "API Password: {apiPass:s}\n"
             "API URL:      {apiURL:s}\n"
+            "Data Path:    {dataPath:s}\n"
         ).format(
-            apiName = self.apiName,
-            apiUser = self.apiUser,
-            apiPass = "*"*len(self.apiPass),
-            apiURL  = self.apiURL,
+            apiName  = self.apiName,
+            apiUser  = self.apiUser,
+            apiPass  = "*"*len(self.apiPass),
+            apiURL   = self.apiURL,
+            dataPath = self.dataPath,
         )
 
     def printInfo(self, showPw=False):
@@ -71,6 +74,7 @@ class Config():
         logger.info("API Username: %s" % self.apiUser)
         logger.info("API Password: %s" % apiPass)
         logger.info("API URL:      %s" % self.apiURL)
+        logger.info("Data Path:    %s" % self.dataPath)
         return
 
     def loadConfig(self, apiName=None):
@@ -91,6 +95,8 @@ class Config():
             try:
                 with open(userConf, mode="r") as inFile:
                     jsonData = json.loads(inFile.read())
+
+                self.dataPath = jsonData.get("dataPath", "")
 
                 if apiName is None:
                     apiName = jsonData.get("default", None)

@@ -1,4 +1,5 @@
 {
+    "dataPath" : "/home",
     "default" : "copernicus",
     "apis": [
         {

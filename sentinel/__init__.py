@@ -27,7 +27,7 @@ import logging
 
 from .autoapi import AutoAPI
 from .config import Config
-from .sentinelone import SentinelOne
+from .sentinel import Sentinel
 
 __package__    = "sentinel"
 __author__     = "Veronica Berglyd Olsen"
@@ -43,7 +43,7 @@ __credits__    = [
 __all__ = [
     "AutoAPI",
     "Config",
-    "SentinelOne",
+    "Sentinel",
 ]
 
 # Initiating logging

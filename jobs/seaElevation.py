@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import json
 
 from os import environ, path
 
@@ -12,8 +11,8 @@ sys.path.insert(1, rootDir)
 environ["SENTINEL_LOGLEVEL"] = "DEBUG"
 
 # Tools import
-from sentinel import logger, Config, AutoAPI # noqa: E402
-from sentinelsat import SentinelAPI, read_geojson, geojson_to_wkt # noqa: E402
+from sentinel import logger, Config, AutoAPI, Sentinel # noqa: E402
+from sentinelsat import SentinelAPI # noqa: E402
 
 logger.debug("Script dir: %s" % rootDir)
 
@@ -22,27 +21,39 @@ sConf = Config(apiName="eumetsat")
 sConf.printInfo()
 
 sAPI = AutoAPI(sConf)
+sData = Sentinel(sConf.dataPath)
 cAPI = sAPI.getAPI()
-
-fpFile = path.join(rootDir, "tests", "input", "map.geojson")
-fpMap = geojson_to_wkt(read_geojson(fpFile))
+fpMap = (
+    "POLYGON(("
+    "-19.4134 50.4665, "
+    " 38.8403 50.4665, "
+    " 38.8403 79.3619, "
+    "-19.4134 79.3619, "
+    "-19.4134 50.4665"
+    "))"
+)
+fpQuery = (
+    "("
+    "platformname:Sentinel-3 "
+    "AND producttype:SR_2_WAT___ "
+    "AND instrumentshortname:SRAL "
+    "AND productlevel:L2"
+    ")"
+)
 
 cQuery = SentinelAPI.format_query(
     area = fpMap,
-    raw  = (
-        "("
-        "platformname:Sentinel-3 "
-        "AND producttype:SR_2_WAT___ "
-        "AND instrumentshortname:SRAL "
-        "AND productlevel:L2"
-        ")"
-    ),
-    date = ("2020-05-01T00:00:00Z", "2020-05-31T23:59:59Z")
+    raw  = fpQuery,
+    date = ("2019-08-01T00:00:00Z", "2019-09-13T23:59:59Z")
 )
 # print(cQuery)
 
 nResult = cAPI.count(raw=cQuery)
 logger.info("Query matched %d datasets" % nResult)
 
-# qDict = cAPI.query(raw=cQuery)
-# print(json.dumps(qDict, indent=2))
+qDict = cAPI.query(raw=cQuery)
+for aKey, aDataSet in qDict.items():
+    print(aKey)
+    for dKey, dValue in aDataSet.items():
+        print("%s:" % dKey, dValue)
+    break

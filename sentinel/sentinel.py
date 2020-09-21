@@ -24,25 +24,45 @@
 
 import logging
 
-from sentinelsat import SentinelAPI
-
-from .autoapi import AutoAPI
+from os import path
 
 logger = logging.getLogger(__name__)
 
 class Sentinel():
 
-    def __init__(self, api=None):
+    def __init__(self, dataPath):
 
-        self._theAPI = None
-
-        if isinstance(api, SentinelAPI):
-            self._theAPI = api
-        elif isinstance(api, AutoAPI):
-            self._theAPI = api.getAPI()
+        if path.isdir(dataPath):
+            self._dataPath = dataPath
         else:
-            raise ValueError("Attribute 'api' must be a SentinelAPI or AutoAPI object")
+            logger.error("Data folder does not exist: %s" % dataPath)
+            raise FileNotFoundError("Data folder does not exist: %s" % dataPath)
 
         return
+
+    ##
+    #  Getters
+    ##
+
+    @property
+    def dataPath(self):
+        return self._dataPath
+
+    ##
+    #  Setters
+    ##
+
+    @dataPath.setter
+    def dataPath(self, value):
+        if isinstance(value, str):
+            self._dataPath = value
+        else:
+            logger.error("Parameter 'value' must be a string")
+            raise ValueError("Parameter 'value' must be a string")
+        return
+
+    ##
+    #  Methods
+    ##
 
 # END Class Sentinel
