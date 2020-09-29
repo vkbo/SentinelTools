@@ -34,6 +34,7 @@ class AutoAPI():
 
     def __init__(self, config):
 
+        self._theConfig = config
         self._apiUser = ""
         self._apiPass = ""
         self._apiURL  = "https://scihub.copernicus.eu"
@@ -108,7 +109,11 @@ class AutoAPI():
         """
         if self._theAPI is None or not isinstance(self._theAPI, SentinelAPI):
             raise ConnectionError("Not connected to the API")
-
         return self._theAPI
+
+    def getConfig(self):
+        """Return the config object.
+        """
+        return self._theConfig
 
 # END Class AutoAPI

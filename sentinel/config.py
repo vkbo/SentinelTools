@@ -45,6 +45,9 @@ class Config():
         self.apiURL   = ""
         self.dataPath = ""
 
+        # Saved Searches
+        self._savedSearches = {}
+
         self.loadConfig(apiName=apiName)
 
         return
@@ -97,6 +100,7 @@ class Config():
                     jsonData = json.loads(inFile.read())
 
                 self.dataPath = jsonData.get("dataPath", "")
+                self._savedSearches = jsonData.get("searches", {})
 
                 if apiName is None:
                     apiName = jsonData.get("default", None)
@@ -132,5 +136,11 @@ class Config():
             logger.debug("No file: %s" % userConf)
 
         return
+
+    def getSearch(self, searchName):
+        """Return a dictionary object of a saved search from the config
+        file. Returns an empty dictionary if the searchName isn't found.
+        """
+        return self._savedSearches.get(searchName, {})
 
 # END Class Config

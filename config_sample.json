@@ -8,5 +8,6 @@
             "apiPassword": "",
             "apiURL": "https://scihub.copernicus.eu/apihub"
         }
-    ]
+    ],
+    "searches": {}
 }
