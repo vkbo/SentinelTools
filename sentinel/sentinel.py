@@ -26,9 +26,11 @@ import logging
 import json
 
 from os import path
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
+from .config import Config
+from .autoapi import AutoAPI
 from .utils import ensureFolderExists, isValidUUID4
 
 logger = logging.getLogger(__name__)
@@ -36,22 +38,39 @@ logger = logging.getLogger(__name__)
 class Sentinel():
 
     DIR_QUERY = "QueryData"
+    DIR_STATE = "QueryState"
     IDX_DATA  = "dataIndex.json"
 
-    def __init__(self, dataPath):
+    def __init__(self, confOrAPI, dataPath=None):
 
-        self._dataPath = None
-        if path.isdir(dataPath):
-            self._dataPath = dataPath
+        if isinstance(confOrAPI, AutoAPI):
+            self._theAPI = confOrAPI.getAPI()
+            self._theConfig = confOrAPI.getConfig()
+        elif isinstance(confOrAPI, Config):
+            self._theAPI = AutoAPI(confOrAPI).getAPI()
+            self._theConfig = confOrAPI
         else:
+            raise AttributeError(
+                "confOrAPI must be either a Config or an AutoAPI object, got %s" % type(confOrAPI)
+            )
+
+        if dataPath is None:
+            self._dataPath = self._theConfig.dataPath
+        else:
+            self._dataPath = dataPath
+
+        if not path.isdir(self._dataPath):
             logger.error("Data folder does not exist: %s" % dataPath)
             raise FileNotFoundError("Data folder does not exist: %s" % dataPath)
 
         self._queryDir = path.join(self._dataPath, self.DIR_QUERY)
+        self._stateDir = path.join(self._dataPath, self.DIR_STATE)
         self._indexPath = path.join(self._dataPath, self.IDX_DATA)
 
         self._dataIndex = {}
         self._indexChanged = False
+
+        # self._loadDataIndex()
 
         return
 
@@ -76,13 +95,12 @@ class Sentinel():
             raise ValueError("Parameter 'value' must be a string")
         return
 
-    def setIndexEntry(self, uuid, title=None, date=None, summary=None, size=None, status=None):
+    def _logQueryEntry(self, uuid, title=None, date=None, size=None, status=None):
         """Set the values for a dataset in the index.
         """
         newEntry = self._dataIndex.get(uuid, {
             "title": "",
             "date": "",
-            "summary": "",
             "size": "",
             "status": DataSetStatus.NEW.name,
         })
@@ -90,8 +108,6 @@ class Sentinel():
             newEntry["title"] = str(title)
         if date is not None:
             newEntry["date"] = str(date)
-        if summary is not None:
-            newEntry["summary"] = str(summary)
         if size is not None:
             newEntry["size"] = str(size)
         if status is not None:
@@ -108,6 +124,54 @@ class Sentinel():
     ##
     #  Methods
     ##
+
+    def processSearch(self, searchName, contLast=False, endPosition=None, saveResult=True):
+        """Process a saved search from the main config file and
+        optionally continue from the last point until now or a given
+        end position.
+        """
+        theSearch = self._theConfig.getSearch(searchName)
+        if not theSearch:
+            logger.error("No saved search named '%s'" % searchName)
+            return {}
+
+        logger.info("Processing search: %s" % searchName)
+
+        qArea = None
+        qRaw = None
+        qAreaRelation = "Intersects"
+        startFrom = None
+        kwArgs = {}
+        for aKey, aValue in theSearch.items():
+            if aKey == "area":
+                qArea = aValue
+            elif aKey == "raw":
+                qRaw = aValue
+            elif aKey == "area_relation":
+                qAreaRelation = aValue
+            elif aKey == "startfrom":
+                startFrom = aValue
+            else:
+                kwArgs[aKey] = aValue
+
+        if startFrom is not None:
+            if endPosition is None:
+                qDate = (startFrom, "NOW")
+            else:
+                qDate = (startFrom, endPosition)
+        else:
+            qDate = None
+
+        theQuery = self._theAPI.format_query(
+            area=qArea, date=qDate, raw=qRaw, area_relation=qAreaRelation, **kwArgs
+        )
+        logger.info("Processing Query: %s" % theQuery)
+        qDict = self._theAPI.query(raw=theQuery)
+
+        if saveResult:
+            self.saveQueryResults(qDict)
+
+        return qDict
 
     def saveQueryResults(self, qDict):
         """Split up a query result and save it to the data folder.
@@ -130,7 +194,7 @@ class Sentinel():
                 elif isinstance(aValue, bool):
                     cleanDict[aKey] = aValue
                 elif isinstance(aValue, datetime):
-                    cleanDict[aKey] = aValue.isoformat()
+                    cleanDict[aKey] = aValue.isoformat(sep="T", timespec="milliseconds")+"Z"
                 else:
                     logger.error("Unsupported datatype %s of key '%s'" % (type(aValue), aKey))
 
@@ -149,13 +213,12 @@ class Sentinel():
                 logger.error(str(e))
                 continue
 
-            self.setIndexEntry(
-                uuid=qUUID,
-                title=cleanDict.get("title", None),
-                summary=cleanDict.get("summary", None),
-                size=cleanDict.get("size", None),
-                date=cleanDict.get("beginposition", None)
-            )
+            # self.setIndexEntry(
+            #     uuid=qUUID,
+            #     title=cleanDict.get("title", None),
+            #     size=cleanDict.get("size", None),
+            #     date=cleanDict.get("beginposition", None)
+            # )
             nSaved += 1
 
         return nSaved

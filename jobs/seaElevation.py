@@ -20,40 +20,43 @@ logger.debug("Script dir: %s" % rootDir)
 sConf = Config(apiName="eumetsat")
 sConf.printInfo()
 
-sAPI = AutoAPI(sConf)
-sData = Sentinel(sConf.dataPath)
-cAPI = sAPI.getAPI()
-fpMap = (
-    "POLYGON(("
-    "-19.4134 50.4665, "
-    " 38.8403 50.4665, "
-    " 38.8403 79.3619, "
-    "-19.4134 79.3619, "
-    "-19.4134 50.4665"
-    "))"
-)
-fpQuery = (
-    "("
-    "platformname:Sentinel-3 "
-    "AND producttype:SR_2_WAT___ "
-    "AND instrumentshortname:SRAL "
-    "AND productlevel:L2"
-    ")"
-)
+sData = Sentinel(sConf)
+sData.processSearch("S3_SR2_WAT", endPosition="2019-09-20T23:59:59Z")
 
-cQuery = SentinelAPI.format_query(
-    area = fpMap,
-    raw  = fpQuery,
-    date = ("2019-09-01T00:00:00Z", "2019-09-19T23:59:59Z")
-)
-# print(cQuery)
+# sAPI = AutoAPI(sConf)
+# sData = Sentinel(sConf.dataPath)
+# cAPI = sAPI.getAPI()
+# fpMap = (
+#     "POLYGON(("
+#     "-19.4134 50.4665, "
+#     " 38.8403 50.4665, "
+#     " 38.8403 79.3619, "
+#     "-19.4134 79.3619, "
+#     "-19.4134 50.4665"
+#     "))"
+# )
+# fpQuery = (
+#     "("
+#     "platformname:Sentinel-3 "
+#     "AND producttype:SR_2_WAT___ "
+#     "AND instrumentshortname:SRAL "
+#     "AND productlevel:L2"
+#     ")"
+# )
 
-nResult = cAPI.count(raw=cQuery)
-logger.info("Query matched %d datasets" % nResult)
+# cQuery = SentinelAPI.format_query(
+#     area = fpMap,
+#     raw  = fpQuery,
+#     date = ("2019-09-01T00:00:00Z", "2019-09-19T23:59:59Z")
+# )
+# # print(cQuery)
 
-qDict = cAPI.query(raw=cQuery)
-sData.saveQueryResults(qDict)
-sData.flushIndex()
+# nResult = cAPI.count(raw=cQuery)
+# logger.info("Query matched %d datasets" % nResult)
+
+# qDict = cAPI.query(raw=cQuery)
+# sData.saveQueryResults(qDict)
+# sData.flushIndex()
 # for aKey, aDataSet in qDict.items():
 #     print(aKey)
 #     for dKey, dValue in aDataSet.items():
