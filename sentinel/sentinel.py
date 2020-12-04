@@ -31,7 +31,7 @@ from enum import Enum
 
 from .config import Config
 from .autoapi import AutoAPI
-from .utils import ensureFolderExists, isValidUUID4
+from .tools import ensureFolderExists, isValidUUID4
 
 logger = logging.getLogger(__name__)
 

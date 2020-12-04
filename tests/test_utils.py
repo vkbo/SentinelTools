@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from sentinel.utils import isValidUUID4, parseSizeString
+from sentinel.tools import isValidUUID4, parseSizeString
 
 def testValidUUID4():
     assert not isValidUUID4(0)
